@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 public class Native {
     // TODO: Cleanup
-    // Don't use allocMemory but but protectMemory instead
+    // Don't use allocMemory but protectMemory instead
     // rename getByteBuffer to fromPointer
 
     public static native ByteBuffer getByteBuffer(long address, long capacity);
