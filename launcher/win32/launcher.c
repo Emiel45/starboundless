@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     STARTUPINFOA startupInfo;
     PROCESS_INFORMATION processInformation;
 
@@ -10,7 +10,10 @@ void main(int argc, char *argv[]) {
 
     startupInfo.cb = sizeof(startupInfo);
 
-    printf("Path: %s\n", argv[1]);
+    if(argc != 2) {
+        printf("Usage: launcher.exe <path_to_starbound.exe>");
+        return 1;
+    }
 
     CreateProcessA(argv[1], 0, 0, 0, FALSE,  CREATE_SUSPENDED, 0, 0, &startupInfo, &processInformation);
 
@@ -26,4 +29,5 @@ void main(int argc, char *argv[]) {
     WriteProcessMemory(processHandle, remotePath, fullPath, MAX_PATH, &writtenBytes);
 
     HANDLE remoteThread = CreateRemoteThread(processHandle, NULL, 0, (LPTHREAD_START_ROUTINE) loadLibraryAddress, remotePath, 0, NULL);
+    return 0;
 }
