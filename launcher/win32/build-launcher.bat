@@ -1,0 +1,1 @@
+tcc launcher.c -Iincludes -luser32 -o bin\launcher.exe

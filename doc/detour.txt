@@ -1,0 +1,13 @@
+
+push ebp                ; preserver ebp
+mov ebp, esp            ; preserve esp
+
+sub esp, 4              ; make room
+
+mov dword ptr [esp], 1  ; 1st argument = 1
+call 0x000001           ; call function
+
+mov esp, ebp            ; put back esp
+pop ebp                 ; put back ebp
+
+
