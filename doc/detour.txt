@@ -11,6 +11,17 @@ mov esp, ebp            ; put back esp
 pop ebp                 ; put back ebp
 
 ; trampoline
+
+
+
+
+
+
+
+
+
+
+
 push ecx ; stdcall uses this
 push edx ; stdcall uses this
 
@@ -26,7 +37,7 @@ call AttachCurrentThread
 
 ; TODO: check eax
 
-mov ecx, esp
+mov ecx, [esp]
 mov esp, ebp
 
 sub esp, argCount * 4

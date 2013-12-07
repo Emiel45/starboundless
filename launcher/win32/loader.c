@@ -74,7 +74,41 @@ void JNICALL Java_boundless_Native_call(JNIEnv *env, jclass clazz, jlong address
 }
 
 jlong JNICALL Java_boundless_Native_getJVMPointer(JNIEnv *env, jclass clazz) {
-    return (jlong)jvm;
+    return (jlong) jvm;
+}
+
+jlong JNICALL Java_boundless_JNIEnv_getEnvPointer(JNIEnv *env, jclass clazz) {
+    return (jlong) env;
+}
+
+jlong JNICALL Java_boundless_JNIEnv_getMethodID(JNIEnv *env, jclass _clazz, jclass clazz, jstring name, jstring signature) {
+    const char *utf_name, *utf_signature;
+    jboolean isCopy;
+    utf_name = (*env)->GetStringUTFChars(env, name, &isCopy);
+    utf_signature = (*env)->GetStringUTFChars(env, signature, &isCopy);
+
+    jmethodID methodID = (*env)->GetMethodID(env, clazz, utf_name, utf_signature);
+
+    (*env)->ReleaseStringUTFChars(env, name, utf_name);
+    (*env)->ReleaseStringUTFChars(env, signature, utf_signature);
+    return (jlong) methodID;
+}
+
+jlong JNICALL Java_boundless_JNIEnv_getStaticMethodID(JNIEnv *env, jclass _clazz, jclass clazz, jstring name, jstring signature) {
+    const char *utf_name, *utf_signature;
+    jboolean isCopy;
+    utf_name = (*env)->GetStringUTFChars(env, name, &isCopy);
+    utf_signature = (*env)->GetStringUTFChars(env, signature, &isCopy);
+
+    jmethodID methodID = (*env)->GetStaticMethodID(env, clazz, utf_name, utf_signature);
+
+    (*env)->ReleaseStringUTFChars(env, name, utf_name);
+    (*env)->ReleaseStringUTFChars(env, signature, utf_signature);
+    return (jlong) methodID;
+}
+
+jlong JNICALL Java_boundless_JNIEnv_getClassPtr(JNIEnv *env, jclass _clazz, jclass clazz) {
+    return (jlong) clazz;
 }
 
 DWORD WINAPI loadjre(LPVOID lpParam) {
@@ -132,9 +166,6 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
         return 1;
     }
 
-    jclass boundless_Loader = (*env)->FindClass(env, "boundless/Loader");
-    jmethodID boundless_Loader_main = (*env)->GetStaticMethodID(env, boundless_Loader, "main", "()V");
-
     JNINativeMethod nativeMethods[6] = { 0 };
     ZeroMemory(&nativeMethods, sizeof(nativeMethods));
 
@@ -165,6 +196,25 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
     jclass boundless_Native = (*env)->FindClass(env, "boundless/Native");
     (*env)->RegisterNatives(env, boundless_Native, nativeMethods, 6);
 
+    nativeMethods[0].name = "getEnvPointer";
+    nativeMethods[0].signature = "()J";
+    nativeMethods[0].fnPtr = &Java_boundless_JNIEnv_getEnvPointer;
+
+    nativeMethods[1].name = "getMethodID";
+    nativeMethods[1].signature = "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)J";
+    nativeMethods[1].fnPtr = &Java_boundless_JNIEnv_getMethodID;
+
+    nativeMethods[2].name = "getStaticMethodID";
+    nativeMethods[2].signature = "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)J";
+    nativeMethods[2].fnPtr = &Java_boundless_JNIEnv_getStaticMethodID;
+
+    nativeMethods[3].name = "getClassPtr";
+    nativeMethods[3].signature = "(Ljava/lang/Class;)J";
+    nativeMethods[3].fnPtr = &Java_boundless_JNIEnv_getClassPtr;
+
+    jclass boundless_JNIEnv = (*env)->FindClass(env, "boundless/JNIEnv");
+    (*env)->RegisterNatives(env, boundless_JNIEnv, nativeMethods, 4);
+
     nativeMethods[0].name = "decompose";
     nativeMethods[0].signature = "(Ldistorm/CodeInfo;Ldistorm/DecomposedResult;)V";
     nativeMethods[0].fnPtr = &Java_distorm_Distorm_decompose;
@@ -182,7 +232,14 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
 
     jdistorm_init(env);
 
+
+    jclass boundless_Loader = (*env)->FindClass(env, "boundless/Loader");
+    jmethodID boundless_Loader_main = (*env)->GetStaticMethodID(env, boundless_Loader, "main", "()V");
     (*env)->CallStaticVoidMethod(env, boundless_Loader, boundless_Loader_main);
+
+    // jmethodID boundless_Loader_callback = (*env)->GetStaticMethodID(env, boundless_Loader, "callback", "(II)V");
+    // asm("int  $0x13");
+    // (*env)->CallStaticVoidMethod(env, boundless_Loader, boundless_Loader_callback, 0xdeadbeef, 0x123456);    
     return 0;
 }
 
