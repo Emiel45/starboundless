@@ -2,7 +2,7 @@
 push ebp                ; preserver ebp
 mov ebp, esp            ; preserve esp
 
-sub esp, 4              ; make room
+sub esp, 4              ; make room for arguments
 
 mov dword ptr [esp], 1  ; 1st argument = 1
 call 0x000001           ; call function
@@ -10,4 +10,48 @@ call 0x000001           ; call function
 mov esp, ebp            ; put back esp
 pop ebp                 ; put back ebp
 
+; trampoline
+push ecx ; stdcall uses this
+push edx ; stdcall uses this
 
+push ebp ; stack allocation
+mov ebp, esp
+
+sub esp, 4
+
+push 0
+push esp
+push jvm
+call AttachCurrentThread
+
+; TODO: check eax
+
+mov ecx, esp
+mov esp, ebp
+
+sub esp, argCount * 4
+mov [esp + 0], [ebp + 0]
+mov [esp + 4], [ebp + 4]
+mov [esp + 8], [ebp + 16]
+; etc...
+
+push esp        ; args
+push methodID
+push clazz
+push ecx        ; env
+call CallIntMethodA
+
+; eax is now set to value returned by CallIntMethodA
+
+mov esp, ebp
+pop ebp
+
+pop edx
+pop ecx
+retn
+
+; oiriginal stub
+; instr1
+; instr2
+; etc...
+jmp 1       ; jmp to orinal function remainder

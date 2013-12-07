@@ -6,10 +6,13 @@
 
 #include <jni.h>
 
+#include <jdistorm.h>
+
 HANDLE WINAPI OpenThread(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwThreadId);
 DWORD WINAPI GetThreadId(HANDLE Thread);
 
 HINSTANCE instanceHandle;
+JavaVM *jvm;
 
 DWORD GetProcessThreadId(DWORD dwProcessID) {
     THREADENTRY32 te = { sizeof(THREADENTRY32) };
@@ -70,6 +73,10 @@ void JNICALL Java_boundless_Native_call(JNIEnv *env, jclass clazz, jlong address
     ((scall)address)();
 }
 
+jlong JNICALL Java_boundless_Native_getJVMPointer(JNIEnv *env, jclass clazz) {
+    return (jlong)jvm;
+}
+
 DWORD WINAPI loadjre(LPVOID lpParam) {
     char moduleFileName[MAX_PATH];
     GetModuleFileNameA(instanceHandle, moduleFileName, MAX_PATH);
@@ -103,7 +110,6 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
 
     CreateJavaVM_t *CreateJavaVM = (CreateJavaVM_t *) GetProcAddress(jreHandle, "JNI_CreateJavaVM");
 
-    JavaVM *jvm;
     JNIEnv *env;
     JavaVMOption vm_options[1] = { 0 };
     
@@ -128,8 +134,8 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
 
     jclass boundless_Loader = (*env)->FindClass(env, "boundless/Loader");
     jmethodID boundless_Loader_main = (*env)->GetStaticMethodID(env, boundless_Loader, "main", "()V");
-    
-    JNINativeMethod nativeMethods[5] = { 0 };
+
+    JNINativeMethod nativeMethods[6] = { 0 };
     ZeroMemory(&nativeMethods, sizeof(nativeMethods));
 
     nativeMethods[0].name = "getByteBuffer";
@@ -152,9 +158,30 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
     nativeMethods[4].signature = "(J)V";
     nativeMethods[4].fnPtr = &Java_boundless_Native_call;
 
+    nativeMethods[5].name = "getJVMPointer";
+    nativeMethods[5].signature = "()J";
+    nativeMethods[5].fnPtr = &Java_boundless_Native_getJVMPointer;
+
     jclass boundless_Native = (*env)->FindClass(env, "boundless/Native");
-    (*env)->RegisterNatives(env, boundless_Native, nativeMethods, 5);
-        
+    (*env)->RegisterNatives(env, boundless_Native, nativeMethods, 6);
+
+    nativeMethods[0].name = "decompose";
+    nativeMethods[0].signature = "(Ldistorm/CodeInfo;Ldistorm/DecomposedResult;)V";
+    nativeMethods[0].fnPtr = &Java_distorm_Distorm_decompose;
+
+    nativeMethods[1].name = "decode";
+    nativeMethods[1].signature = "(Ldistorm/CodeInfo;Ldistorm/DecodedResult;)V";
+    nativeMethods[1].fnPtr = &Java_distorm_Distorm_decode;
+
+    nativeMethods[2].name = "format";
+    nativeMethods[2].signature = "(Ldistorm/CodeInfo;Ldistorm/DecomposedInst;)Ldistorm/DecodedInst;";
+    nativeMethods[2].fnPtr = &Java_distorm_Distorm_format;
+
+    jclass distorm_Distorm = (*env)->FindClass(env, "distorm/Distorm");
+    (*env)->RegisterNatives(env, distorm_Distorm, nativeMethods, 3);
+
+    jdistorm_init(env);
+
     (*env)->CallStaticVoidMethod(env, boundless_Loader, boundless_Loader_main);
     return 0;
 }

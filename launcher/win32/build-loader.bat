@@ -1,1 +1,1 @@
-tcc loader.c -Iincludes -Llib -luser32 -ladvapi32 -shared -o bin\loader.dll
+tcc loader.c distorm.c -Iinclude -Llib -luser32 -ladvapi32 -shared -o bin\loader.dll

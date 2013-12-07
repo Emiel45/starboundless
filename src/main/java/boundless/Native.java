@@ -12,4 +12,5 @@ public class Native {
     public static native void resumeLaunch();
     public static native long addressOf(ByteBuffer buffer);
     public static native void call(long address);
+    public static native long getJVMPointer();
 }
