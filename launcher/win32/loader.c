@@ -111,6 +111,51 @@ jlong JNICALL Java_boundless_JNIEnv_getClassPtr(JNIEnv *env, jclass _clazz, jcla
     return (jlong) clazz;
 }
 
+typedef jboolean (*booleanCall)(void *argsAddress);
+jboolean JNICALL Java_boundless_natives_call_CallInterface_callBoolean(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    return ((booleanCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
+typedef jbyte (*byteCall)(void *argsAddress);
+jbyte JNICALL Java_boundless_natives_call_CallInterface_callByte(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    return ((byteCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
+typedef jchar (*charCall)(void *argsAddress);
+jchar JNICALL Java_boundless_natives_call_CallInterface_callChar(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    return ((charCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
+typedef jshort (*shortCall)(void *argsAddress);
+jshort JNICALL Java_boundless_natives_call_CallInterface_callShort(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    return ((shortCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
+typedef jint (*intCall)(void *argsAddress);
+jint JNICALL Java_boundless_natives_call_CallInterface_callInt(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    return ((intCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
+typedef jlong (*longCall)(void *argsAddress);
+jlong JNICALL Java_boundless_natives_call_CallInterface_callLong(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    return ((longCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
+typedef jfloat (*floatCall)(void *argsAddress);
+jfloat JNICALL Java_boundless_natives_call_CallInterface_callFloat(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    return ((floatCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
+typedef jdouble (*doubleCall)(void *argsAddress);
+jdouble JNICALL Java_boundless_natives_call_CallInterface_callDouble(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    return ((doubleCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
+typedef void (*voidCall)(void *argsAddress);
+void JNICALL Java_boundless_natives_call_CallInterface_callVoid(JNIEnv *env, jclass clazz, jlong address, jobject argsBuffer) {
+    ((voidCall) address)((*env)->GetDirectBufferAddress(env, argsBuffer));
+}
+
 DWORD WINAPI loadjre(LPVOID lpParam) {
     char moduleFileName[MAX_PATH];
     GetModuleFileNameA(instanceHandle, moduleFileName, MAX_PATH);
@@ -166,7 +211,7 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
         return 1;
     }
 
-    JNINativeMethod nativeMethods[6] = { 0 };
+    JNINativeMethod nativeMethods[0xff] = { 0 };
     ZeroMemory(&nativeMethods, sizeof(nativeMethods));
 
     nativeMethods[0].name = "getByteBuffer";
@@ -230,6 +275,45 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
     jclass distorm_Distorm = (*env)->FindClass(env, "distorm/Distorm");
     (*env)->RegisterNatives(env, distorm_Distorm, nativeMethods, 3);
 
+    nativeMethods[0].name = "callBoolean";
+    nativeMethods[0].signature = "(JLjava/nio/ByteBuffer;)Z";
+    nativeMethods[0].fnPtr = &Java_boundless_natives_call_CallInterface_callBoolean;
+
+    nativeMethods[1].name = "callByte";
+    nativeMethods[1].signature = "(JLjava/nio/ByteBuffer;)B";
+    nativeMethods[1].fnPtr = &Java_boundless_natives_call_CallInterface_callByte;
+
+    nativeMethods[2].name = "callChar";
+    nativeMethods[2].signature = "(JLjava/nio/ByteBuffer;)C";
+    nativeMethods[2].fnPtr = &Java_boundless_natives_call_CallInterface_callChar;
+
+    nativeMethods[3].name = "callShort";
+    nativeMethods[3].signature = "(JLjava/nio/ByteBuffer;)S";
+    nativeMethods[3].fnPtr = &Java_boundless_natives_call_CallInterface_callShort;
+
+    nativeMethods[4].name = "callInt";
+    nativeMethods[4].signature = "(JLjava/nio/ByteBuffer;)I";
+    nativeMethods[4].fnPtr = &Java_boundless_natives_call_CallInterface_callInt;
+
+    nativeMethods[5].name = "callLong";
+    nativeMethods[5].signature = "(JLjava/nio/ByteBuffer;)J";
+    nativeMethods[5].fnPtr = &Java_boundless_natives_call_CallInterface_callLong;
+
+    nativeMethods[6].name = "callFloat";
+    nativeMethods[6].signature = "(JLjava/nio/ByteBuffer;)F";
+    nativeMethods[6].fnPtr = &Java_boundless_natives_call_CallInterface_callFloat;
+
+    nativeMethods[7].name = "callDouble";
+    nativeMethods[7].signature = "(JLjava/nio/ByteBuffer;)D";
+    nativeMethods[7].fnPtr = &Java_boundless_natives_call_CallInterface_callDouble;
+
+    nativeMethods[8].name = "callVoid";
+    nativeMethods[8].signature = "(JLjava/nio/ByteBuffer;)V";
+    nativeMethods[8].fnPtr = &Java_boundless_natives_call_CallInterface_callVoid;
+
+    jclass boundless_natives_call_CallInterface = (*env)->FindClass(env, "boundless/natives/call/CallInterface");
+    (*env)->RegisterNatives(env, boundless_natives_call_CallInterface, nativeMethods, 9);
+
     jdistorm_init(env);
 
 
@@ -237,6 +321,10 @@ DWORD WINAPI loadjre(LPVOID lpParam) {
     jmethodID boundless_Loader_main = (*env)->GetStaticMethodID(env, boundless_Loader, "main", "()V");
     (*env)->CallStaticVoidMethod(env, boundless_Loader, boundless_Loader_main);
 
+    if((*env)->ExceptionOccurred(env)) {
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+    }
     // jmethodID boundless_Loader_callback = (*env)->GetStaticMethodID(env, boundless_Loader, "callback", "(II)V");
     // asm("int  $0x13");
     // (*env)->CallStaticVoidMethod(env, boundless_Loader, boundless_Loader_callback, 0xdeadbeef, 0x123456);    

@@ -1,14 +1,10 @@
 package boundless.natives;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 
 public class NativeClass {
     private String name;

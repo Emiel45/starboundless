@@ -1,0 +1,26 @@
+brush:
+    clear
+    back
+    object
+    item
+    npc
+    random
+    surface
+    surfacebackground
+    water
+    lava
+    acid
+    tentaclejuice
+    tarliquid
+    wire
+
+rules:
+    worldGenMustContainSolid
+    worldGenMustContainAir
+    worldGenMustContainSolidBackground
+    worldGenMustContainAirBackground
+    allowOverdrawing
+    ignorePartMaximumRule
+    maxSpawnCount
+    doNotConnectToPart
+    doNotCombineWith

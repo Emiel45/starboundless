@@ -1,9 +1,8 @@
 package boundless;
 
-import boundless.hook.HookCallback;
+import boundless.natives.hook.HookCallback;
 import boundless.natives.NativeArguments;
 import boundless.natives.NativeFunction;
-import com.google.common.reflect.TypeToken;
 
 import java.lang.reflect.ParameterizedType;
 
@@ -12,7 +11,7 @@ public class TypeTokenTest {
         HookCallback<?> stuff = new HookCallback<Void>() {
 
             @Override
-            public Void call(NativeFunction original, NativeArguments arguments) {
+            public Void call(NativeFunction original, NativeArguments arguments, int ecx) {
                 return null;
             }
         };

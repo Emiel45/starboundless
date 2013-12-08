@@ -5,15 +5,15 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 
 public enum NativeReturnType {
-    BOOLEAN('Z', "Boolean", Boolean.class),
-    BYTE('B', "Byte", Byte.class),
-    CHAR('C', "Char", Character.class),
-    SHORT('S', "Short", Short.class),
-    INT('I', "Int", Integer.class),
-    LONG('J', "Long", Long.class),
-    FLOAT('F', "Float", Float.class),
-    DOUBLE('D', "Double", Double.class),
-    VOID('V', "Void", Void.class);
+    BOOLEAN('Z', "Boolean", Boolean.class, true),
+    BYTE('B', "Byte", Byte.class, true),
+    CHAR('C', "Char", Character.class, true),
+    SHORT('S', "Short", Short.class, true),
+    INT('I', "Int", Integer.class, true),
+    LONG('J', "Long", Long.class, true),
+    FLOAT('F', "Float", Float.class, false),
+    DOUBLE('D', "Double", Double.class, false),
+    VOID('V', "Void", Void.class, false);
 
     private static final Map<Character, NativeReturnType> identifierToReturnType = Maps.newHashMap();
     private static final Map<String, NativeReturnType> typeNameToReturnType = Maps.newHashMap();
@@ -41,11 +41,13 @@ public enum NativeReturnType {
     private char identifier;
     private String typeName;
     private Class<?> wrappedPrimitive;
+    public boolean usesEax;
 
-    private NativeReturnType(char identifier, String typeName, Class<?> wrappedPrimitive) {
+    private NativeReturnType(char identifier, String typeName, Class<?> wrappedPrimitive, boolean usesEax) {
         this.identifier = identifier;
         this.typeName = typeName;
         this.wrappedPrimitive = wrappedPrimitive;
+        this.usesEax = usesEax;
     }
 
     public char identifier() {
@@ -58,5 +60,9 @@ public enum NativeReturnType {
 
     public Class<?> wrappedPrimitive() {
         return wrappedPrimitive;
+    }
+
+    public boolean usesEax() {
+        return usesEax;
     }
 }
