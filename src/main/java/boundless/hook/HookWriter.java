@@ -2,23 +2,22 @@ package boundless.hook;
 
 import boundless.JNIEnv;
 import boundless.Native;
-import jnr.x86asm.Asm;
+import boundless.natives.NativeReturnType;
 import jnr.x86asm.Assembler;
-import jnr.x86asm.CPU;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import static java.nio.ByteOrder.nativeOrder;
 import static jnr.x86asm.Asm.*;
 import static jnr.x86asm.CPU.X86_32;
 
 public class HookWriter {
-    public static void writeHook(long offset, long classPtr, long methodId, long hookId) {
+    public static long writeHook(long offset, long hookId, NativeReturnType returnType) {
         long jvm = Native.getJVMPointer();
+        long classPointer = JNIEnv.getClassPtr(HookCallbackNative.class);
+        long methodId = JNIEnv.getMethodID(HookCallbackNative.class, "callback" + returnType.typeName(), "(II)" + returnType.identifier());
 
-        ByteBuffer jvmStruct =
-                Native.getByteBuffer(Native.getByteBuffer(jvm, 4).order(nativeOrder()).getInt(), 8*4).order(nativeOrder());
+        ByteBuffer jvmStruct = Native.getByteBuffer(Native.getByteBuffer(jvm, 4).order(nativeOrder()).getInt(), 8 * 4).order(nativeOrder());
         long jvm_AttachCurrentThread = jvmStruct.getInt(4 * 4);
 
         // Write landing method
@@ -48,7 +47,7 @@ public class HookWriter {
         asm.push(ebp);
         asm.push(uimm(hookId));
         asm.push(uimm(methodId));
-        asm.push(uimm(classPtr));
+        asm.push(uimm(classPointer));
         asm.push(ebx);
         asm.call(JNIEnv.addressOfMethod("CallStaticVoidMethod"));
 
@@ -74,5 +73,8 @@ public class HookWriter {
         ByteBuffer function = Native.getByteBuffer(offset, asm.codeSize()).order(nativeOrder());
         // write trampoline
         asm.relocCode(function, offset);
+
+        // TODO return original function
+        return 0;
     }
 }

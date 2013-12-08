@@ -14,5 +14,10 @@
             <artifactId>jnr-x86asm</artifactId>
             <version>1.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
+        </dependency>
     </dependencies>
 </project>
