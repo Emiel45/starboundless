@@ -1,26 +1,52 @@
-brush:
-    clear
-    back
-    object
-    item
-    npc
-    random
-    surface
-    surfacebackground
-    water
-    lava
-    acid
-    tentaclejuice
-    tarliquid
-    wire
+metadata:
+    name
+    rules
+    maxRadius
+    maxParts
+    anchor
+    tiles
 
-rules:
-    worldGenMustContainSolid
-    worldGenMustContainAir
-    worldGenMustContainSolidBackground
-    worldGenMustContainAirBackground
-    allowOverdrawing
-    ignorePartMaximumRule
-    maxSpawnCount
-    doNotConnectToPart
-    doNotCombineWith
+tiles:
+    value
+    brush:
+        clear
+        back
+        object:
+            parameters
+
+        item
+        npc:
+            seed
+            stable
+
+        random
+        surface
+        surfacebackground
+        water
+        lava
+        acid
+        tentaclejuice
+        tarliquid
+        wire:
+            default
+            group
+            local
+    rules:
+        worldGenMustContainSolid
+        worldGenMustContainAir
+        worldGenMustContainSolidBackground
+        worldGenMustContainAirBackground
+    connector
+    connector-value
+
+parts:
+    image:
+        overrideAllowAlways
+
+    rules:
+        allowOverdrawing
+        ignorePartMaximumRule
+        maxSpawnCount
+        doNotConnectToPart
+        doNotCombineWith
+    
